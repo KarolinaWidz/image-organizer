@@ -1,6 +1,6 @@
 package edu.karolinawidz.imageorganizer;
 
-import edu.karolinawidz.imageorganizer.repo.AppUserRepo;
+import edu.karolinawidz.imageorganizer.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
@@ -24,14 +24,14 @@ import java.util.Arrays;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private UserDetailsServiceImpl userDetailsService;
-	private AppUserRepo appUserRepo;
+	private UserRepo userRepo;
 //	private TagRepo tagRepo;
 	//private ImageRepo imageRepo;
 
 	@Autowired
-	public WebSecurityConfig(UserDetailsServiceImpl userDetailsService,AppUserRepo appUserRepo/*, TagRepo tagRepo,ImageRepo imageRepo */){
+	public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, UserRepo userRepo/*, TagRepo tagRepo,ImageRepo imageRepo */){
 		this.userDetailsService=userDetailsService;
-		this.appUserRepo = appUserRepo;
+		this.userRepo = userRepo;
 		//this.tagRepo = tagRepo;
 		//this.imageRepo = imageRepo;
 
@@ -54,6 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.formLogin().permitAll();
 	}
 
+
 	@Bean
 	public PasswordEncoder passwordEncoder (){
 		return new BCryptPasswordEncoder();
@@ -75,6 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		configuration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
+
 		return source;
 	}
 

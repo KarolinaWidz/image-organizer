@@ -1,6 +1,6 @@
 package edu.karolinawidz.imageorganizer;
 
-import edu.karolinawidz.imageorganizer.repo.AppUserRepo;
+import edu.karolinawidz.imageorganizer.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,16 +12,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	private AppUserRepo appUserRepo;
+	private UserRepo userRepo;
 
 	@Autowired
-	public UserDetailsServiceImpl(AppUserRepo appUserRepo) {
-		this.appUserRepo = appUserRepo;
+	public UserDetailsServiceImpl(UserRepo userRepo) {
+		this.userRepo = userRepo;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-		return appUserRepo.findByUsername(s);
+		return userRepo.findByUsername(s);
 	}
 
 }
