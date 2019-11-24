@@ -55,7 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable();
 		http.authorizeRequests()
-				.antMatchers("/adduser").hasRole("USER")
+				.antMatchers("/test1").hasRole("USER")
 				.antMatchers("/test2").hasRole("ADMIN")
 				.antMatchers("/uploadImage").hasRole("ADMIN")
 				.and()
@@ -68,8 +68,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	@EventListener(ApplicationReadyEvent.class)
 	public void get(){
-		AppUser appUserUser = new AppUser("Jan",passwordEncoder().encode("Jan123"),"ROLE_USER");
-		AppUser appUserAdmin = new AppUser("Ala",passwordEncoder().encode("Jan123"),"ROLE_ADMIN");
+		//AppUser appUserUser = new AppUser("Jan",passwordEncoder().encode("Jan123"),"ROLE_USER");
+		//AppUser appUserAdmin = new AppUser("Ala",passwordEncoder().encode("Jan123"),"ROLE_ADMIN");
 		/*List <Tag> tags = new ArrayList<>();
 		Image image1;
 

@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface TagRepo extends JpaRepository<Tag,Long> {
-	//Page<Tag> findByImageID(Long imageId, Pageable pageable);
-	//Optional<Tag> findbyIdAndImageId(Long id, Long imageId);
+
 
 }

@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name="tags")
 public class Tag {
 
 	@Id
@@ -14,12 +15,11 @@ public class Tag {
 	@Column(name="tags_id")
 	private Long id;
 
-	@NotNull
 	@Column(name = "tag")
 	private String tagName;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name ="image_id")
+	@ManyToOne
+	@JoinColumn(name ="image_id",nullable = false)
 	private Image image;
 
 	public Tag() {

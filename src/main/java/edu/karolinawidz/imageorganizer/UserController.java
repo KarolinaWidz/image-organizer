@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-public class Controller {
+public class UserController {
 
 	@RequestMapping(value = "/adduser", method =  RequestMethod.POST)
 	public String addUser(){

@@ -5,8 +5,10 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
+@Table(name="IMAGES")
 public class Image {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,19 +18,19 @@ public class Image {
 	private String imagePath;
 
 	@OneToMany(mappedBy = "image")
-	private List<Tag> tags;
+	private Set<Tag> tags;
 
 	public Image() {
 	}
 
-	public Image(String imagePath, List<Tag> tags) {
+	public Image(String imagePath, Set<Tag> tags) {
 		this.imagePath = imagePath;
 		this.tags = tags;
 	}
 
-	public void addTags(Tag tag){
+	public void addTags(Tag tag) {
 		this.tags.add((tag));
-		if(tag.getImage()!=this){
+		if (tag.getImage() != this) {
 			tag.setImage(this);
 		}
 	}
@@ -49,11 +51,13 @@ public class Image {
 		this.imagePath = imagePath;
 	}
 
-	public List<Tag> getTags() {
+	public Set<Tag> getTags() {
 		return tags;
 	}
 
-	public void setTags(List<Tag> tags) {
+	public void setTags(Set<Tag> tags) {
 		this.tags = tags;
 	}
 }
+
+
