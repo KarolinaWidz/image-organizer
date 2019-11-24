@@ -8,7 +8,7 @@ import java.util.Collection;
 
 @Entity
 @Table(name="users")
-public class AppUser implements UserDetails {
+public class User implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -16,10 +16,10 @@ public class AppUser implements UserDetails {
 	private String password;
 
 
-	public AppUser(){
+	public User(){
 	}
 
-	public AppUser(String username, String password, String role){
+	public User(String username, String password, String role){
 		this.username=username;
 		this.password=password;
 	}

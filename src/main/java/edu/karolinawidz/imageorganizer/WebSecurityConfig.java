@@ -1,11 +1,6 @@
 package edu.karolinawidz.imageorganizer;
 
-import edu.karolinawidz.imageorganizer.model.AppUser;
-import edu.karolinawidz.imageorganizer.model.Image;
-import edu.karolinawidz.imageorganizer.model.Tag;
 import edu.karolinawidz.imageorganizer.repo.AppUserRepo;
-import edu.karolinawidz.imageorganizer.repo.ImageRepo;
-import edu.karolinawidz.imageorganizer.repo.TagRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 
 @EnableWebSecurity
@@ -50,8 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 
-
-	@Override //ustawianie zeby bylo haslo
+	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable();
 		http.authorizeRequests()
@@ -62,24 +54,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.formLogin().permitAll();
 	}
 
-	@Bean //Szyfrowanie hasla
+	@Bean
 	public PasswordEncoder passwordEncoder (){
 		return new BCryptPasswordEncoder();
 	}
 	@EventListener(ApplicationReadyEvent.class)
 	public void get(){
-		//AppUser appUserUser = new AppUser("Jan",passwordEncoder().encode("Jan123"),"ROLE_USER");
-		//AppUser appUserAdmin = new AppUser("Ala",passwordEncoder().encode("Jan123"),"ROLE_ADMIN");
-		/*List <Tag> tags = new ArrayList<>();
-		Image image1;
-
-		image1 = new Image("C:\\Users\\HP\\Pictures\\karolinasuprajs.png",tags);
-		Tag t1 = new Tag("kupa",image1);
-		tags.add(t1);
-		appUserRepo.save(appUserUser);
-		appUserRepo.save(appUserAdmin);
-		tagRepo.save(t1);
-		imageRepo.save(image1);*/
+		//User appUserUser = new User("Jan",passwordEncoder().encode("Jan123"),"ROLE_USER");
+		//User appUserAdmin = new User("Ala",passwordEncoder().encode("Jan123"),"ROLE_ADMIN");
 
 
 	}
