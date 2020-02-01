@@ -21,6 +21,7 @@ public class ImageUploader {
 
 	}
 
+
 	public String uploadFile(String path){
 		File file = new File(path);
 		Map uploadResult = null;
@@ -29,7 +30,7 @@ public class ImageUploader {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		return "";
+		return uploadResult.get("url").toString();
 	}
 
 }

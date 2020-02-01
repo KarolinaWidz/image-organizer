@@ -18,12 +18,12 @@ public class Image {
 	private String imagePath;
 
 	@OneToMany(mappedBy = "image")
-	private Set<Tag> tags;
+	private List <Tag> tags;
 
 	public Image() {
 	}
 
-	public Image(String imagePath, Set<Tag> tags) {
+	public Image(String imagePath, List<Tag> tags) {
 		this.imagePath = imagePath;
 		this.tags = tags;
 	}
@@ -51,11 +51,11 @@ public class Image {
 		this.imagePath = imagePath;
 	}
 
-	public Set<Tag> getTags() {
+	public List<Tag> getTags() {
 		return tags;
 	}
 
-	public void setTags(Set<Tag> tags) {
+	public void setTags(List <Tag> tags) {
 		this.tags = tags;
 	}
 }

@@ -44,6 +44,6 @@ public class TagController {
 
 	@RequestMapping(value = "/image/{id}/tags/{tagId}", method = RequestMethod.DELETE)
 	public String deleteTag (@PathVariable("id")long id, @PathVariable("tagId")long tagId) {
-		return "You updated a tag";
+		return "You deleted a tag";
 	}
 }
