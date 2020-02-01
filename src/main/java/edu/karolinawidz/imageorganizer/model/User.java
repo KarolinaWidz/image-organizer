@@ -19,7 +19,7 @@ public class User implements UserDetails {
 	public User(){
 	}
 
-	public User(String username, String password, String role){
+	public User(String username, String password/*, String role*/){
 		this.username=username;
 		this.password=password;
 	}
@@ -31,6 +31,7 @@ public class User implements UserDetails {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
 
 	public void setUsername(String username) {
 		this.username = username;
@@ -74,4 +75,6 @@ public class User implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
+
+
 }
