@@ -3,6 +3,7 @@ package edu.karolinawidz.imageorganizer.controller;
 import com.sun.xml.bind.v2.runtime.unmarshaller.TagName;
 import edu.karolinawidz.imageorganizer.ImageUploader;
 import edu.karolinawidz.imageorganizer.model.Image;
+import edu.karolinawidz.imageorganizer.model.ImageResult;
 import edu.karolinawidz.imageorganizer.model.Tag;
 import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -32,13 +34,32 @@ public class ImageController {
 	private ImageUploader imageUploader;
 
 	@RequestMapping(value = "/image", method = RequestMethod.GET)
-	public ResponseEntity <?> getAllImage() {
-		return ResponseEntity.ok().body(imageRepo.findAll());
+	public ResponseEntity<?> getAllImage() {
+		List <Image> imageRepoAll = imageRepo.findAll();
+		List <ImageResult> results = new ArrayList<>();
+		for (Image image: imageRepoAll) {
+			List <String> tagName = new ArrayList<>();
+			for (Tag tag: image.getTags()) {
+				tagName.add(tag.getTagName());
+			}
+			ImageResult tmp = new ImageResult(image.getId(),image.getImagePath(),tagName);
+			results.add(tmp);
+		}
+		return ResponseEntity.ok().body(results);
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getImage(@PathVariable("id") long id) {
-		return ResponseEntity.ok().body(imageRepo.findById(id));
+		if (imageRepo.findById(id).isPresent()) {
+			Image image = imageRepo.findById(id).get();
+			List <String> tagName = new ArrayList<>();
+			for (Tag tag: image.getTags()) {
+				tagName.add(tag.getTagName());
+			}
+			ImageResult result = new ImageResult(image.getId(), image.getImagePath(), tagName);
+			return ResponseEntity.ok().body(result);
+		}
+		return ResponseEntity.badRequest().body("Image with this id is not existing");
 	}
 
 	@RequestMapping(value = "/image", method = RequestMethod.POST)
@@ -52,6 +73,12 @@ public class ImageController {
 	public ResponseEntity<?> deleteImage(@PathVariable("id") long id) {
 		if(imageRepo.findById(id).isPresent()){
 			Image image = imageRepo.findById(id).get();
+			List<Tag> tags = image.getTags();
+			for (Tag tag : tags){
+				if(!tagRepo.findByTagName(tag.getTagName()).isEmpty()){
+					tagRepo.delete(tag);
+				}
+			}
 			imageRepo.delete(image);
 			return ResponseEntity.ok().body("Deleted!");
 		}
@@ -69,11 +96,10 @@ public class ImageController {
 				List <Tag> existingTag = tagRepo.findByTagName(tag);
 				if(!existingTag.isEmpty())
 					for(Tag existing : existingTag) {
-						if (!existing.getTagName().equals(tmp.getTagName())){
+						if (!existing.getTagName().equals(tmp.getTagName()) || !existing.getImage().equals(tmp.getImage())){
 							tagRepo.save(tmp);
 							tagList.add(tmp);
-						} else
-							break;
+						}
 					}
 				else{
 					tagRepo.save(tmp);

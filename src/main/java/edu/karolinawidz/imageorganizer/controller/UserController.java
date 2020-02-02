@@ -2,8 +2,9 @@ package edu.karolinawidz.imageorganizer.controller;
 
 
 import edu.karolinawidz.imageorganizer.UserDetailsServiceImpl;
-import edu.karolinawidz.imageorganizer.model.User;
-import edu.karolinawidz.imageorganizer.model.UserResponse;
+import edu.karolinawidz.imageorganizer.model.*;
+import edu.karolinawidz.imageorganizer.repo.ImageRepo;
+import edu.karolinawidz.imageorganizer.repo.TagRepo;
 import edu.karolinawidz.imageorganizer.repo.UserRepo;
 import edu.karolinawidz.imageorganizer.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.soap.SOAPBinding;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -23,9 +24,16 @@ public class UserController {
 
 	private final UserRepo userRepo;
 
-	public UserController(UserRepo userRepo) {
+	private final TagRepo tagRepo;
+
+	private final ImageRepo imageRepo;
+
+	public UserController(UserRepo userRepo, TagRepo tagRepo, ImageRepo imageRepo) {
 		this.userRepo = userRepo;
+		this.tagRepo = tagRepo;
+		this.imageRepo = imageRepo;
 	}
+
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -66,9 +74,31 @@ public class UserController {
 	}
 
 
-	@RequestMapping(value = "/user/tags/{tagId}", method = RequestMethod.GET)
-	public String getImagesByTag(@PathVariable("tagId")int tagId) {
-		return "You get images";
+	@RequestMapping(value = "/user/tags/{tagName}", method = RequestMethod.GET)
+	public ResponseEntity<?> getImagesByTag(@PathVariable("tagName")String tagName) {
+		if(!imageRepo.findAll().isEmpty()){
+			List<ImageResult> result = new ArrayList<>();
+			for (Image image: imageRepo.findAll()) {
+				List <Tag> existingTag = image.getTags();
+				if(!existingTag.isEmpty()) {
+					for (Tag existing : existingTag) {
+						if (existing.getTagName().equals(tagName)) {
+							List<String> tmp = new ArrayList<>();
+							for (Tag tag : image.getTags()) {
+								tmp.add(tag.getTagName());
+							}
+							result.add(new ImageResult(image.getId(), image.getImagePath(), tmp));
+						}
+					}
+				}
+				else{
+					break;
+				}
+			}
+
+			return ResponseEntity.ok().body(result);
+		}
+		return ResponseEntity.badRequest().body("You don't have any images");
 	}
 
 

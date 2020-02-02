@@ -36,13 +36,44 @@ public class TagController {
 			return ResponseEntity.badRequest().body("Image with this id is not existing");
 	}
 
-	@RequestMapping(value = "/image/{id}/tags/{tagId}", method = RequestMethod.PUT)
-	public String updateTag (@PathVariable("id")long id, @PathVariable("tagId")long tagId) {
-		return "You updated a tag";
+	@RequestMapping(value = "/image/tags/{id}/{tagId}", method = RequestMethod.PUT)
+	public ResponseEntity<?> updateTag (@PathVariable("id")long id, @PathVariable("tagId")long tagId, @RequestParam("tags")String tag) {
+		if(imageRepo.findById(id).isPresent()) {
+			Image image = imageRepo.findById(id).get();
+			if (tagRepo.findById(tagId).isPresent()) {
+				Tag existingTag = tagRepo.findById(tagId).get();
+				if (image.getTags().contains(existingTag)) {
+					List<Tag> tagsInImage = image.getTags();
+					for (Tag tagInImage : tagsInImage) {
+						if (tagInImage.getId().equals(tagId)) {
+							tagInImage.setTagName(tag);
+							tagRepo.save(tagInImage);
+						}
+					}
+					image.setTags(tagsInImage);
+					imageRepo.save(image);
+				}
+				return ResponseEntity.ok().body("Updated!");
+			}
+			else
+				return ResponseEntity.badRequest().body("Tag with this id is not existing!");
+		}
+		return ResponseEntity.badRequest().body("Image with this id is not existing");
 	}
 
-	@RequestMapping(value = "/image/{id}/tags/{tagId}", method = RequestMethod.DELETE)
-	public String deleteTag (@PathVariable("id")long id, @PathVariable("tagId")long tagId) {
-		return "You deleted a tag";
+	@RequestMapping(value = "/image//tags/{id}/{tagId}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> deleteTag (@PathVariable("id")long id, @PathVariable("tagId")long tagId) {
+		if(imageRepo.findById(id).isPresent()) {
+			if(tagRepo.findById(tagId).isPresent()) {
+				Tag existingTag = tagRepo.findById(tagId).get();
+				tagRepo.delete(existingTag);
+				return ResponseEntity.ok().body("Deleted!");
+			}
+			else
+				return ResponseEntity.badRequest().body("Tag with this id is not existing!");
+
+		}
+		return ResponseEntity.badRequest().body("Image with this id is not existing");
+
 	}
 }
