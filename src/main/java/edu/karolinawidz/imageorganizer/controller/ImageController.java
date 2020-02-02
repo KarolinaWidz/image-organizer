@@ -10,6 +10,7 @@ import edu.karolinawidz.imageorganizer.repo.TagRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,7 +60,7 @@ public class ImageController {
 			ImageResult result = new ImageResult(image.getId(), image.getImagePath(), tagName);
 			return ResponseEntity.ok().body(result);
 		}
-		return ResponseEntity.badRequest().body("Image with this id is not existing");
+		return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = "/image", method = RequestMethod.POST)
@@ -83,7 +84,7 @@ public class ImageController {
 			return ResponseEntity.ok().body("Deleted!");
 		}
 		else
-			return ResponseEntity.badRequest().body("Image with this id is not existing");
+			return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.PUT)
@@ -110,10 +111,8 @@ public class ImageController {
 			imageRepo.save(image);
 			return ResponseEntity.ok().body("Updated!");
 		}
-		return ResponseEntity.badRequest().body("Image with this id is not existing");
-
+		return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
 	}
-
 }
 
 

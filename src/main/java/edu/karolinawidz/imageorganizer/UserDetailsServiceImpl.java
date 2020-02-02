@@ -23,8 +23,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-		//return userRepo.findByUsername(userName);
-		return new User("test","test", new ArrayList<>());
+		return userRepo.findByUsername(userName);
+		//return new User("test","test", new ArrayList<>());
 	}
 
 }

@@ -4,6 +4,7 @@ import edu.karolinawidz.imageorganizer.model.Image;
 import edu.karolinawidz.imageorganizer.model.Tag;
 import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ public class TagController {
 			return ResponseEntity.ok().body(result);
 		}
 		else
-			return ResponseEntity.badRequest().body("Image with this id is not existing");
+			return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = "/image/tags/{id}/{tagId}", method = RequestMethod.PUT)
@@ -56,9 +57,9 @@ public class TagController {
 				return ResponseEntity.ok().body("Updated!");
 			}
 			else
-				return ResponseEntity.badRequest().body("Tag with this id is not existing!");
+				return new ResponseEntity<>("Tag with this id is not existing!", HttpStatus.NOT_FOUND);
 		}
-		return ResponseEntity.badRequest().body("Image with this id is not existing");
+		return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
 	}
 
 	@RequestMapping(value = "/image//tags/{id}/{tagId}", method = RequestMethod.DELETE)
@@ -70,10 +71,10 @@ public class TagController {
 				return ResponseEntity.ok().body("Deleted!");
 			}
 			else
-				return ResponseEntity.badRequest().body("Tag with this id is not existing!");
+				return new ResponseEntity<>("Tag with this id is not existing!", HttpStatus.NOT_FOUND);
 
 		}
-		return ResponseEntity.badRequest().body("Image with this id is not existing");
+		return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
 
 	}
 }

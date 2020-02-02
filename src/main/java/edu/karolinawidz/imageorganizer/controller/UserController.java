@@ -8,6 +8,7 @@ import edu.karolinawidz.imageorganizer.repo.TagRepo;
 import edu.karolinawidz.imageorganizer.repo.UserRepo;
 import edu.karolinawidz.imageorganizer.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,29 +47,39 @@ public class UserController {
 	private UserDetailsServiceImpl userDetailsService;
 
 	@RequestMapping(value = "/user", method =  RequestMethod.POST)
-	public String addUser(){
-		return "You added user";
-	}
-
-	@RequestMapping(value ="/user/{id}", method = RequestMethod.GET)
-	public String getUser(@PathVariable("id")int id){
-		return "You get the user";
-	}
-
-	@RequestMapping(value="/user/{id}", method = {RequestMethod.DELETE})
-	public @ResponseBody String deleteUser(@PathVariable("id")int id){
-		return "You delete the user";
+	public ResponseEntity<?> addUser(@RequestHeader("login") String login, @RequestHeader("password") String password){
+		String status="";
+		if(!login.isEmpty() || !password.isEmpty()){
+			List <User> existingUsers = userRepo.findAll();
+			if(!existingUsers.isEmpty()){
+				for (User user : existingUsers) {
+					if (!user.getUsername().equals(login)) {
+						User tmp = new User(login, password);
+						userRepo.save(tmp);
+						status = "You add user!";
+					} else
+						status = "User with this username is already exist";
+				}
+			}
+			else {
+				User tmp = new User(login, password);
+				userRepo.save(tmp);
+				status = "You add user!";
+			}
+			return ResponseEntity.ok(status);
+		}
+		return new ResponseEntity<>("Missing Data", HttpStatus.BAD_REQUEST);
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity<?> createAuthenticationToke(@RequestBody User authenticationRequest )throws Exception{
+	public ResponseEntity<?> createAuthenticationToke(@RequestHeader("login") String login, @RequestHeader("password") String password){
 		try {
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),authenticationRequest.getPassword()));
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login,password));
 		}
 		catch (BadCredentialsException e){
-			throw new Exception("Incorrect username or password",e);
+			return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
 		}
-		final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+		final UserDetails userDetails = userDetailsService.loadUserByUsername(login);
 		final String jwt = jwtTokenUtil.generateToken(userDetails);
 		return ResponseEntity.ok(new UserResponse(jwt));
 	}
@@ -95,10 +106,9 @@ public class UserController {
 					break;
 				}
 			}
-
 			return ResponseEntity.ok().body(result);
 		}
-		return ResponseEntity.badRequest().body("You don't have any images");
+		return new ResponseEntity<>("You don't have any images", HttpStatus.NOT_FOUND);
 	}
 
 

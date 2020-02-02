@@ -61,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable()
-				.authorizeRequests().antMatchers("/login").permitAll()
+				.authorizeRequests().antMatchers("/user","/login").permitAll()
 				.anyRequest().authenticated()
 				.and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -73,6 +73,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder (){
 		return NoOpPasswordEncoder.getInstance();
 	}
+
+	//@Bean
+	//public PasswordEncoder passwordEncoder() {
+	//	return new BCryptPasswordEncoder();
+	//}
 	//@EventListener(ApplicationReadyEvent.class)
 	//public void get(){
 		//User appUserUser = new User("Jan",passwordEncoder().encode("Jan123"),"ROLE_USER");
