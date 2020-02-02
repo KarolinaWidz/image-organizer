@@ -1,18 +1,16 @@
 package edu.karolinawidz.imageorganizer.controller;
 
+import edu.karolinawidz.imageorganizer.model.Image;
 import edu.karolinawidz.imageorganizer.model.Tag;
 import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
-@Repository
+@RestController
 public class TagController {
 
 	private final TagRepo tagRepo;
@@ -24,17 +22,18 @@ public class TagController {
 		this.imageRepo = imageRepo;
 	}
 
-
-	//http://localhost:8080/image?id=2/tags
-	@RequestMapping(value = "/image/{id}/tags", method = RequestMethod.GET)
-	public String getAllTags(@PathVariable("id")long id) {
-		return "You get all tags";
-	}
-
-	//http://localhost:8080/image?id=2/tags
-	@RequestMapping(value = "/image/{id}/tags", method = RequestMethod.POST)
-	public String createTag (@PathVariable("id")long id) {
-		return "You created a tag";
+	@RequestMapping(value = "/image/tags/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllTags(@PathVariable("id")long id) {
+		if(imageRepo.findById(id).isPresent()){
+			Image image = imageRepo.findById(id).get();
+			List<String> result = new ArrayList<>();
+			for (Tag tag:image.getTags()) {
+				result.add(tag.getTagName());
+			}
+			return ResponseEntity.ok().body(result);
+		}
+		else
+			return ResponseEntity.badRequest().body("Image with this id is not existing");
 	}
 
 	@RequestMapping(value = "/image/{id}/tags/{tagId}", method = RequestMethod.PUT)

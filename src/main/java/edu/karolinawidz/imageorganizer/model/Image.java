@@ -51,7 +51,7 @@ public class Image {
 		this.imagePath = imagePath;
 	}
 
-	public List<Tag> getTags() {
+	public List <Tag> getTags() {
 		return tags;
 	}
 

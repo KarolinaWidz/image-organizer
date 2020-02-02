@@ -1,5 +1,6 @@
 package edu.karolinawidz.imageorganizer.controller;
 
+import com.sun.xml.bind.v2.runtime.unmarshaller.TagName;
 import edu.karolinawidz.imageorganizer.ImageUploader;
 import edu.karolinawidz.imageorganizer.model.Image;
 import edu.karolinawidz.imageorganizer.model.Tag;
@@ -52,25 +53,38 @@ public class ImageController {
 		if(imageRepo.findById(id).isPresent()){
 			Image image = imageRepo.findById(id).get();
 			imageRepo.delete(image);
+			return ResponseEntity.ok().body("Deleted!");
 		}
-		return ResponseEntity.ok().body("Deleted!");
+		else
+			return ResponseEntity.badRequest().body("Image with this id is not existing");
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<?> updateImage(@PathVariable("id") long id, @RequestParam("tags")List <String> tags) {
 		if(imageRepo.findById(id).isPresent()){
 			Image image = imageRepo.findById(id).get();
-			List<Tag> tagList = new ArrayList<Tag>();
+			List<Tag> tagList = new ArrayList<>();
 			for (String tag:tags) {
-				System.out.println(tag);
 				Tag tmp = new Tag(tag,image);
-				tagRepo.save(tmp);
-				tagList.add(tmp);
+				List <Tag> existingTag = tagRepo.findByTagName(tag);
+				if(!existingTag.isEmpty())
+					for(Tag existing : existingTag) {
+						if (!existing.getTagName().equals(tmp.getTagName())){
+							tagRepo.save(tmp);
+							tagList.add(tmp);
+						} else
+							break;
+					}
+				else{
+					tagRepo.save(tmp);
+					tagList.add(tmp);
+				}
 			}
 			image.setTags(tagList);
-			return ResponseEntity.ok().body(imageRepo.save(image));
+			imageRepo.save(image);
+			return ResponseEntity.ok().body("Updated!");
 		}
-		return (ResponseEntity<?>) ResponseEntity.badRequest();
+		return ResponseEntity.badRequest().body("Image with this id is not existing");
 
 	}
 
