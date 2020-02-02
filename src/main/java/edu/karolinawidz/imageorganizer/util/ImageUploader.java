@@ -1,9 +1,8 @@
-package edu.karolinawidz.imageorganizer;
+package edu.karolinawidz.imageorganizer.util;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;

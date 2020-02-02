@@ -1,22 +1,18 @@
 package edu.karolinawidz.imageorganizer.controller;
 
-import com.sun.xml.bind.v2.runtime.unmarshaller.TagName;
-import edu.karolinawidz.imageorganizer.ImageUploader;
+import edu.karolinawidz.imageorganizer.util.ImageUploader;
 import edu.karolinawidz.imageorganizer.model.Image;
 import edu.karolinawidz.imageorganizer.model.ImageResult;
 import edu.karolinawidz.imageorganizer.model.Tag;
 import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController

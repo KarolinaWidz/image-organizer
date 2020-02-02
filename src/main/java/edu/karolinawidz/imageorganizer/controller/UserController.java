@@ -1,7 +1,7 @@
 package edu.karolinawidz.imageorganizer.controller;
 
 
-import edu.karolinawidz.imageorganizer.UserDetailsServiceImpl;
+import edu.karolinawidz.imageorganizer.security.UserDetailsServiceImpl;
 import edu.karolinawidz.imageorganizer.model.*;
 import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
@@ -15,7 +15,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 

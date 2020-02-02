@@ -1,10 +1,7 @@
 package edu.karolinawidz.imageorganizer.model;
 
 
-import com.sun.istack.NotNull;
-
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name="tags")
