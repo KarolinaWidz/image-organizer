@@ -1,6 +1,7 @@
 package edu.karolinawidz.imageorganizer.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
@@ -16,7 +17,8 @@ public class Image {
 	@NotNull
 	private String imagePath;
 
-	@OneToMany(mappedBy = "image")
+	@OneToMany(mappedBy = "image",cascade={CascadeType.ALL}, orphanRemoval=true)
+	@JsonIgnore
 	private List <Tag> tags;
 
 	public Image() {

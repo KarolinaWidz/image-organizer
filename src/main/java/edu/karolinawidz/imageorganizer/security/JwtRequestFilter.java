@@ -2,6 +2,8 @@ package edu.karolinawidz.imageorganizer.security;
 
 import edu.karolinawidz.imageorganizer.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,6 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			jwt = authorizationHeader.substring(7);
 			username = jwtUtil.extractUsername(jwt);
 		}
+		else new ResponseEntity<>("Token not found", HttpStatus.FORBIDDEN);
 
 		if(username!=null && SecurityContextHolder.getContext().getAuthentication() ==null) {
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
@@ -41,7 +44,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			}
+			else
+				new ResponseEntity<>("Token not found", HttpStatus.FORBIDDEN);
 		}
+		new ResponseEntity<>("Token not found", HttpStatus.FORBIDDEN);
 		filterChain.doFilter(httpServletRequest,httpServletResponse);
 	}
 }

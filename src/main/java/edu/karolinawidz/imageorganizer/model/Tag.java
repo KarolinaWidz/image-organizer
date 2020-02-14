@@ -17,6 +17,7 @@ public class Tag {
 
 	@ManyToOne
 	@JoinColumn(name ="image_id",nullable = false)
+
 	private Image image;
 
 	public Tag() {

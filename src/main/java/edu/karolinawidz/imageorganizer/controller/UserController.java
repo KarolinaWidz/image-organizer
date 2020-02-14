@@ -1,11 +1,13 @@
 package edu.karolinawidz.imageorganizer.controller;
 
 
-import edu.karolinawidz.imageorganizer.security.UserDetailsServiceImpl;
-import edu.karolinawidz.imageorganizer.model.*;
-import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
 import edu.karolinawidz.imageorganizer.repo.UserRepo;
+import edu.karolinawidz.imageorganizer.security.UserDetailsServiceImpl;
+import edu.karolinawidz.imageorganizer.model.User;
+import edu.karolinawidz.imageorganizer.model.UserResponse;
+
+import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
+
 import java.util.List;
 
 
@@ -47,7 +49,6 @@ public class UserController {
 
 	@RequestMapping(value = "/user", method =  RequestMethod.POST)
 	public ResponseEntity<?> addUser(@RequestHeader("login") String login, @RequestHeader("password") String password){
-		String status="";
 		if(!login.isEmpty() || !password.isEmpty()){
 			List <User> existingUsers = userRepo.findAll();
 			if(!existingUsers.isEmpty()){
@@ -55,17 +56,17 @@ public class UserController {
 					if (!user.getUsername().equals(login)) {
 						User tmp = new User(login, password);
 						userRepo.save(tmp);
-						status = "You add user!";
+						return ResponseEntity.ok("You add user!");
 					} else
-						status = "User with this username is already exist";
+						return new ResponseEntity<>("User with this username is already exist", HttpStatus.CONFLICT);
 				}
 			}
 			else {
 				User tmp = new User(login, password);
 				userRepo.save(tmp);
-				status = "You add user!";
+				return ResponseEntity.ok("You add user!");
 			}
-			return ResponseEntity.ok(status);
+
 		}
 		return new ResponseEntity<>("Missing Data", HttpStatus.BAD_REQUEST);
 	}
@@ -86,29 +87,8 @@ public class UserController {
 
 	@RequestMapping(value = "/user/tags/{tagName}", method = RequestMethod.GET)
 	public ResponseEntity<?> getImagesByTag(@PathVariable("tagName")String tagName) {
-		if(!imageRepo.findAll().isEmpty()){
-			List<ImageResult> result = new ArrayList<>();
-			for (Image image: imageRepo.findAll()) {
-				List <Tag> existingTag = image.getTags();
-				if(!existingTag.isEmpty()) {
-					for (Tag existing : existingTag) {
-						if (existing.getTagName().equals(tagName)) {
-							List<String> tmp = new ArrayList<>();
-							for (Tag tag : image.getTags()) {
-								tmp.add(tag.getTagName());
-							}
-							result.add(new ImageResult(image.getId(), image.getImagePath(), tmp));
-						}
-					}
-				}
-				else{
-					break;
-				}
-			}
-			return ResponseEntity.ok().body(result);
-		}
-		return new ResponseEntity<>("You don't have any images", HttpStatus.NOT_FOUND);
-	}
-
-
-}
+		if(!tagRepo.findByTagName(tagName).isEmpty())
+			return ResponseEntity.ok().body(tagRepo.findByTagName(tagName));
+		else
+			return new ResponseEntity<>("You don't have any images with this tag", HttpStatus.NOT_FOUND);
+	}}

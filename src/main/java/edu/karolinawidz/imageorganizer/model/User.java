@@ -19,7 +19,7 @@ public class User implements UserDetails {
 	public User(){
 	}
 
-	public User(String username, String password/*, String role*/){
+	public User(String username, String password){
 		this.username=username;
 		this.password=password;
 	}

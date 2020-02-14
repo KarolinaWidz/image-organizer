@@ -1,11 +1,11 @@
 package edu.karolinawidz.imageorganizer.controller;
 
-import edu.karolinawidz.imageorganizer.util.ImageUploader;
+import edu.karolinawidz.imageorganizer.exception.ImageNotFoundException;
 import edu.karolinawidz.imageorganizer.model.Image;
-import edu.karolinawidz.imageorganizer.model.ImageResult;
 import edu.karolinawidz.imageorganizer.model.Tag;
-import edu.karolinawidz.imageorganizer.repo.ImageRepo;
 import edu.karolinawidz.imageorganizer.repo.TagRepo;
+import edu.karolinawidz.imageorganizer.repo.ImageRepo;
+import edu.karolinawidz.imageorganizer.util.ImageUploader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,61 +22,36 @@ public class ImageController {
 
 	private final TagRepo tagRepo;
 
-	public ImageController(ImageRepo imageRepo, TagRepo tagRepo) {
+	public ImageController(ImageRepo imageRepo, TagRepo lebelRepo) {
 		this.imageRepo = imageRepo;
-		this.tagRepo = tagRepo;
+		this.tagRepo = lebelRepo;
 	}
 
 	@Autowired
-	private ImageUploader imageUploader;
+	private ImageUploader memeUploader;
 
 	@RequestMapping(value = "/image", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllImage() {
-		List <Image> imageRepoAll = imageRepo.findAll();
-		List <ImageResult> results = new ArrayList<>();
-		for (Image image: imageRepoAll) {
-			List <String> tagName = new ArrayList<>();
-			for (Tag tag: image.getTags()) {
-				tagName.add(tag.getTagName());
-			}
-			ImageResult tmp = new ImageResult(image.getId(),image.getImagePath(),tagName);
-			results.add(tmp);
-		}
-		return ResponseEntity.ok().body(results);
+	public ResponseEntity<?> getAllMeme() {
+		return ResponseEntity.ok().body(imageRepo.findAll());
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> getImage(@PathVariable("id") long id) {
-		if (imageRepo.findById(id).isPresent()) {
-			Image image = imageRepo.findById(id).get();
-			List <String> tagName = new ArrayList<>();
-			for (Tag tag: image.getTags()) {
-				tagName.add(tag.getTagName());
-			}
-			ImageResult result = new ImageResult(image.getId(), image.getImagePath(), tagName);
-			return ResponseEntity.ok().body(result);
-		}
-		return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
+	public Image getMeme(@PathVariable("id") long id) {
+		return imageRepo.findById(id).orElseThrow(()->new ImageNotFoundException(id));
 	}
 
+
 	@RequestMapping(value = "/image", method = RequestMethod.POST)
-	public ResponseEntity <?> addImage(@RequestParam("path")String path) {
-		String result = imageUploader.uploadFile(path);
+	public ResponseEntity <?> addMeme(@RequestParam("path")String path) {
+		String result = memeUploader.uploadFile(path);
 		Image image = new Image(result,null);
 		return ResponseEntity.ok().body(imageRepo.save(image));
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> deleteImage(@PathVariable("id") long id) {
+	public ResponseEntity<?> deleteMeme(@PathVariable("id") long id) {
 		if(imageRepo.findById(id).isPresent()){
-			Image image = imageRepo.findById(id).get();
-			List<Tag> tags = image.getTags();
-			for (Tag tag : tags){
-				if(!tagRepo.findByTagName(tag.getTagName()).isEmpty()){
-					tagRepo.delete(tag);
-				}
-			}
-			imageRepo.delete(image);
+			imageRepo.deleteById(id);
 			return ResponseEntity.ok().body("Deleted!");
 		}
 		else
@@ -84,40 +59,15 @@ public class ImageController {
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<?> updateImage(@PathVariable("id") long id, @RequestParam("tags")List <String> tags) {
-		if(imageRepo.findById(id).isPresent()){
-			Image image = imageRepo.findById(id).get();
-			List<Tag> tagList = new ArrayList<>();
-			for (String tag:tags) {
-				Tag tmp = new Tag(tag,image);
-				List <Tag> existingTag = tagRepo.findByTagName(tag);
-				if(!existingTag.isEmpty())
-					for(Tag existing : existingTag) {
-						if (!existing.getTagName().equals(tmp.getTagName()) || !existing.getImage().equals(tmp.getImage())){
-							tagRepo.save(tmp);
-							tagList.add(tmp);
-						}
-					}
-				else{
-					tagRepo.save(tmp);
-					tagList.add(tmp);
-				}
+	public ResponseEntity<?> addLabelsToMeme(@PathVariable("id") long id, @RequestParam("tags")List <String> tags) {
+		imageRepo.findById(id).map(element -> {
+			List <Tag> tmp = new ArrayList<>();
+			for(String tag:tags){
+				if(tagRepo.findByTagName(tag).isEmpty())
+					tmp.add(new Tag(tag,element));
 			}
-			image.setTags(tagList);
-			imageRepo.save(image);
-			return ResponseEntity.ok().body("Updated!");
-		}
-		return new ResponseEntity<>("Image with this id is not existing", HttpStatus.NOT_FOUND);
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
+			element.getTags().addAll(tmp);
+			return imageRepo.save(element);
+		}).orElseThrow(()->new ImageNotFoundException(id));
+		return ResponseEntity.ok().body("Updated!");
+	}}
