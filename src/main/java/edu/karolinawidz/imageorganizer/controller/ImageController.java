@@ -31,7 +31,7 @@ public class ImageController {
 	private ImageUploader memeUploader;
 
 	@RequestMapping(value = "/image", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllMeme() {
+	public ResponseEntity<?> getAllImages() {
 		return ResponseEntity.ok().body(imageRepo.findAll());
 	}
 
@@ -42,14 +42,14 @@ public class ImageController {
 
 
 	@RequestMapping(value = "/image", method = RequestMethod.POST)
-	public ResponseEntity <?> addMeme(@RequestParam("path")String path) {
+	public ResponseEntity <?> addImage(@RequestParam("path")String path) {
 		String result = memeUploader.uploadFile(path);
 		Image image = new Image(result,null);
 		return ResponseEntity.ok().body(imageRepo.save(image));
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> deleteMeme(@PathVariable("id") long id) {
+	public ResponseEntity<?> deleteImage(@PathVariable("id") long id) {
 		if(imageRepo.findById(id).isPresent()){
 			imageRepo.deleteById(id);
 			return ResponseEntity.ok().body("Deleted!");
@@ -59,7 +59,7 @@ public class ImageController {
 	}
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<?> addLabelsToMeme(@PathVariable("id") long id, @RequestParam("tags")List <String> tags) {
+	public ResponseEntity<?> addTagsToImage(@PathVariable("id") long id, @RequestParam("tags")List <String> tags) {
 		imageRepo.findById(id).map(element -> {
 			List <Tag> tmp = new ArrayList<>();
 			for(String tag:tags){

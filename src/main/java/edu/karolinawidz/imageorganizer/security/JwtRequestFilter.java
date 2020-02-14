@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -28,14 +30,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
 		final String authorizationHeader = httpServletRequest.getHeader("Authorization");
+		boolean flag=false;
+		boolean tokenFlag=true;
+		final Enumeration<String> headers = httpServletRequest.getHeaderNames();
+		if(headers !=null){
+		while(headers.hasMoreElements()){
+			if(headers.nextElement().equals("login"))
+				flag=true;
+		}}
 		String username = null;
 		String jwt = null;
-
-		if(authorizationHeader!= null && authorizationHeader.startsWith("Bearer ")){
-			jwt = authorizationHeader.substring(7);
-			username = jwtUtil.extractUsername(jwt);
+		if(!flag) {
+			if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+				jwt = authorizationHeader.substring(7);
+				username = jwtUtil.extractUsername(jwt);
+			} else tokenFlag =false;
 		}
-		else new ResponseEntity<>("Token not found", HttpStatus.FORBIDDEN);
 
 		if(username!=null && SecurityContextHolder.getContext().getAuthentication() ==null) {
 			UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
@@ -44,10 +54,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			}
-			else
-				new ResponseEntity<>("Token not found", HttpStatus.FORBIDDEN);
 		}
-		new ResponseEntity<>("Token not found", HttpStatus.FORBIDDEN);
-		filterChain.doFilter(httpServletRequest,httpServletResponse);
+		if(tokenFlag)
+			filterChain.doFilter(httpServletRequest,httpServletResponse);
+		else{
+			httpServletRequest.setAttribute("Token not found", null);
+			httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token not found");}
 	}
+
 }
