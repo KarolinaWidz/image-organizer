@@ -60,6 +60,7 @@ public class ImageController {
 
 	@RequestMapping(value = "/image/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<?> addTagsToImage(@PathVariable("id") long id, @RequestParam("tags")List <String> tags) {
+		if(tags.isEmpty())return new ResponseEntity<>("No tags", HttpStatus.NOT_FOUND);
 		imageRepo.findById(id).map(element -> {
 			List <Tag> tmp = new ArrayList<>();
 			for(String tag:tags){
